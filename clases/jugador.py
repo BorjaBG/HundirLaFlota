@@ -1,4 +1,6 @@
+from clases import barco
 import random
+import pygame
 
 try:
     from clases.barco import Barco
@@ -6,6 +8,36 @@ try:
 except ImportError:
     from barco import Barco
     from tablero import Tablero
+
+# 1. Inicializar el mixer ANTES de cargar cualquier sonido (con buffer de 512 para 0 delay)
+if not pygame.mixer.get_init():
+    pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
+    pygame.mixer.init()
+
+try:
+    SONIDO_CRUCERO = pygame.mixer.Sound("assets/crucero.mp3")
+except Exception:
+    SONIDO_CRUCERO = None
+
+try:
+    SONIDO_PORTAVIONES = pygame.mixer.Sound("assets/portaviones.mp3")
+except Exception:
+    SONIDO_PORTAVIONES = None
+
+try:
+    SONIDO_ACORAZADO = pygame.mixer.Sound("assets/acorazado.mp3")
+except Exception:
+    SONIDO_ACORAZADO = None
+
+try:
+    SONIDO_DESTRUCTOR = pygame.mixer.Sound("assets/destructor.mp3")
+except Exception:
+    SONIDO_DESTRUCTOR = None
+
+try:
+    SONIDO_AGUA = pygame.mixer.Sound("assets/agua.mp3")
+except Exception:
+    SONIDO_AGUA = None
 
 
 class Jugador:
@@ -18,6 +50,7 @@ class Jugador:
         self.barcos_hundidos = 0
         self.colocar_barcos_aleatoriamente()
 
+    
     '''def colocar_barcos(self):
         for barco in self.barcos:
             #cont = 0
@@ -101,6 +134,17 @@ class Jugador:
 
         if (coordenada_x, coordenada_y) in rival.mapa_barcos:
             barco = rival.mapa_barcos[(coordenada_x, coordenada_y)]
+            if not self.es_maquina:
+                match barco.tipo:
+                    case "Portaviones":
+                        SONIDO_PORTAVIONES.play()
+                    case "Crucero":
+                        SONIDO_CRUCERO.play()
+                    case "Destructor":
+                        SONIDO_DESTRUCTOR.play()
+                    case "Acorazado":
+                        SONIDO_ACORAZADO.play()
+
             barco.vidas -= 1
             rival.tablero[coordenada_x][coordenada_y] = 'X'
 
@@ -109,6 +153,8 @@ class Jugador:
 
             return coordenada_x, coordenada_y, barco.vidas, barco
         else:
+            if not self.es_maquina:
+                SONIDO_AGUA.play()
             rival.tablero[coordenada_x][coordenada_y] = 'D'
             return coordenada_x, coordenada_y, -1, None
 

@@ -1,8 +1,4 @@
-"""
-Punto de entrada principal para ejecutar el juego Hundir la Flota con interfaz gráfica Tkinter.
-"""
-
-from tkinter import Tk, Label, Frame, Button
+from tkinter import Tk, Label, Frame, Button, Toplevel, Menu, messagebox
 from variables import barcos, barcos_maquina
 from clases.barco import Barco
 from clases.jugador import Jugador
@@ -20,7 +16,7 @@ def iniciar_juego():
         for barco in barcos_maquina
     ]
 
-    jugador = Jugador("Jugador 1", listado_barcos, False)
+    jugador = Jugador("Jugador", listado_barcos, False)
     maquina = Jugador("Ordenador", listado_barcos_maquina, True)
 
     # Ventana principal
@@ -38,11 +34,11 @@ def iniciar_juego():
         fg="#f8fafc",
         pady=10
     )
-    lbl_estado.pack(fill="x", pady=(0, 10))
+    #lbl_estado.pack(fill="x", pady=(0, 10))
 
     # Contenedor principal
     contenedor = Frame(ventana, bg="#1e293b")
-    contenedor.pack(expand=True)
+    #contenedor.pack(expand=True)
 
     # Tablero izquierdo
     frame_jugador = Frame(contenedor, bg="#0f172a", padx=10, pady=10, relief="ridge", bd=2)
@@ -57,9 +53,104 @@ def iniciar_juego():
     botones_maquina = {}
     botones_jugador = {}
     juego_activo = True
+    turno_jugador = True
+
+    reiniciar_partida = False
+
+    def accion_reiniciar():
+        nonlocal reiniciar_partida
+        reiniciar_partida = True
+        ventana.destroy()
+
+    def accion_salir():
+        nonlocal reiniciar_partida
+        reiniciar_partida = False
+        ventana.destroy()
+
+    # Asegurar que la X de la ventana principal siempre cierre el juego
+    ventana.protocol("WM_DELETE_WINDOW", accion_salir)
+
+    barra_menu = Menu(ventana)
+    ventana.config(menu=barra_menu)
+    menu_partida = Menu(barra_menu, tearoff=0)
+    barra_menu.add_cascade(label="Partida", menu=menu_partida)
+    menu_partida.add_command(label="Nueva partida/Reiniciar", command=accion_reiniciar)
+    menu_partida.add_separator()
+    menu_partida.add_command(label="Salir del juego", command=accion_salir)
+    
+    def mostrar_reglas():
+        messagebox.showinfo("Placeholder de las reglas e instrucciones")
+
+    menu_ayuda = Menu(barra_menu, tearoff=0)
+    barra_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
+    menu_ayuda.add_command(label="Reglas del juego", command=mostrar_reglas)
+
+    def mostrar_pantalla_final(victoria: bool):
+        # Pantalla final superpuesta en la misma ventana (garantiza visibilidad inmediata)
+        frame_fin = Frame(ventana, bg="#1e293b")
+        frame_fin.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        centro_fin = Frame(frame_fin, bg="#0f172a", padx=40, pady=30, relief="ridge", bd=2)
+        centro_fin.pack(expand=True)
+
+        color_titulo = "#4ade80" if victoria else "#f87171"
+        icono = "🏆" if victoria else "💥"
+        texto_titulo = f"{icono} ¡Victoria!" if victoria else f"{icono} ¡Derrota!"
+        texto_desc = (
+            "¡Enhorabuena, comandante! Has hundido toda la flota enemiga."
+            if victoria else
+            "La máquina ha destruido todos tus barcos."
+        )
+
+        Label(
+            centro_fin,
+            text=texto_titulo,
+            font=("Arial", 22, "bold"),
+            fg=color_titulo,
+            bg="#0f172a"
+        ).pack(pady=(0, 10))
+
+        Label(
+            centro_fin,
+            text=texto_desc,
+            font=("Arial", 11),
+            fg="#cbd5e1",
+            bg="#0f172a"
+        ).pack(pady=(0, 25))
+
+        frame_botones_fin = Frame(centro_fin, bg="#0f172a")
+        frame_botones_fin.pack()
+
+        Button(
+            frame_botones_fin,
+            text="🔄 Jugar otra vez",
+            font=("Arial", 12, "bold"),
+            bg="#0284c7",
+            fg="white",
+            activebackground="#0369a1",
+            padx=18,
+            pady=8,
+            bd=0,
+            cursor="hand2",
+            command=accion_reiniciar
+        ).grid(row=0, column=0, padx=10)
+
+        Button(
+            frame_botones_fin,
+            text="❌ Salir del juego",
+            font=("Arial", 12, "bold"),
+            bg="#334155",
+            fg="#f8fafc",
+            activebackground="#475569",
+            padx=18,
+            pady=8,
+            bd=0,
+            cursor="hand2",
+            command=accion_salir
+        ).grid(row=0, column=1, padx=10)
 
     def turno_maquina():
-        nonlocal juego_activo
+        nonlocal juego_activo, turno_jugador
         if not juego_activo:
             return
         mx, my, vidas, barco = maquina.disparar(jugador)
@@ -71,18 +162,20 @@ def iniciar_juego():
                 if maquina.barcos_hundidos == 10:
                     juego_activo = False
                     lbl_estado.config(text="¡Has perdido! Toda tu flota ha sido hundida", fg="#ef4444")
+                    ventana.after(2000, lambda: mostrar_pantalla_final(victoria=False))
                     return
-                lbl_estado.config(text=f"La máquina ha hundido tu {barco.tipo}. La maquina vuelve a disparar", fg="#f87171")
+                lbl_estado.config(text=f"La máquina ha hundido tu {barco.tipo}. Vuelve a disparar...", fg="#f87171")
             else:
-                lbl_estado.config(text=f"Le han dado a tu {barco.tipo}. La maquina vuelve a disparar", fg="#fbbf24")
-            ventana.after(700, turno_maquina)
+                lbl_estado.config(text=f"Le han dado a tu {barco.tipo}. La máquina vuelve a disparar...", fg="#fbbf24")
+            ventana.after(2000, turno_maquina)
         else:
             btn.config(text="D", bg="#0284c7")  # Azul
-            lbl_estado.config(text="La máquina disparó al agua. Es tu turno", fg="#38bdf8")
+            lbl_estado.config(text="La máquina disparó al agua. ¡Es tu turno!", fg="#38bdf8")
+            turno_jugador = True
 
     def disparar_jugador(coor_x, coor_y):
-        nonlocal juego_activo
-        if not juego_activo:
+        nonlocal juego_activo, turno_jugador
+        if not juego_activo or not turno_jugador:
             return
         btn = botones_maquina[(coor_x, coor_y)]
         btn.config(state="disabled")
@@ -95,16 +188,19 @@ def iniciar_juego():
                 if jugador.barcos_hundidos == 10:
                     juego_activo = False
                     lbl_estado.config(text="¡Victoria! Has hundido toda la flota enemiga.", fg="#4ade80")
+                    ventana.after(2000, lambda: mostrar_pantalla_final(victoria=True))
                     return
                 lbl_estado.config(text=f"¡Hundido! Destruiste su {barco.tipo}. Repites disparo", fg="#4ade80")
             else:
                 lbl_estado.config(text=f"Tocado en ({coor_x}, {coor_y}). Repites disparo", fg="#facc15")
             
         else:
+            turno_jugador = False
             btn.config(text="D", bg="#38bdf8", fg="black")
             lbl_estado.config(text=f"Agua en ({coor_x}, {coor_y}). Turno de la máquina...", fg="#94a3b8")
             
-            ventana.after(600, turno_maquina)
+            ventana.after(2000, turno_maquina)
+
 
     for x in range(10):
         for y in range(10):
@@ -144,12 +240,63 @@ def iniciar_juego():
 
             botones_jugador[(x, y)] = btn
 
+    # Pantalla de inicio
+    frame_inicio = Frame(ventana, bg="#1e293b")
+    frame_inicio.place(relx=0, rely=0, relwidth=1, relheight=1)
+    centro = Frame(frame_inicio, bg="#0f172a")
+    centro.pack(expand=True)
+
+    Label(
+        centro,
+        text="Hundir la flota",
+        font=("Arial", 18, "bold"),
+        fg="#94a3b8",
+        bg="#0f172a"
+    ).pack(pady=(0, 30))
+
+    def empezar_partida():
+        frame_inicio.destroy()
+        lbl_estado.pack(fill="x", pady=(10, 0))
+        contenedor.pack(expand=True)
+
+    # Botón principal de JUGAR
+    Button(
+        centro,
+        text="▶ JUGAR",
+        font=("Arial", 14, "bold"),
+        bg="#0284c7",
+        fg="white",
+        activebackground="#0369a1",
+        activeforeground="white",
+        padx=30,
+        pady=10,
+        bd=0,
+        cursor="hand2",
+        command=empezar_partida
+    ).pack(pady=10)
+    # Botón secundario para salir
+    Button(
+        centro,
+        text="Salir",
+        font=("Arial", 10, "bold"),
+        bg="#334155",
+        fg="#cbd5e1",
+        activebackground="#475569",
+        padx=20,
+        pady=6,
+        bd=0,
+        cursor="hand2",
+        command=accion_salir
+    ).pack(pady=5)
+
     ventana.mainloop()
+    return reiniciar_partida
 
 
 def main():
-    iniciar_juego()
-
+    jugar_de_nuevo = True
+    while jugar_de_nuevo:
+        jugar_de_nuevo = iniciar_juego()
 
 if __name__ == "__main__":
     main()

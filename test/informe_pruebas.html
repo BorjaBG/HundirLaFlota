@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe Técnico de Pruebas - Hundir la Flota</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --success-bg: rgba(34, 197, 94, 0.15);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-item strong {
+      color: var(--text);
+    }
+
+    .badge-success {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--success-bg);
+      color: var(--success);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .callout {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 0.92rem;
+      color: #e2e8f0;
+    }
+
+    .terminal-box {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        <span>🚢</span> Informe Técnico de Pruebas: Hundir la Flota
+      </h1>
+      <div class="meta-bar">
+        <div class="meta-item"><strong>Fecha:</strong> 22 de Octubre de 2026</div>
+        <div class="meta-item"><strong>Entorno:</strong> Python 3.13 (Windows) | Pygame 2.6.1</div>
+        <div class="meta-item"><strong>Suite:</strong> <code>test/test_juego.py</code></div>
+        <div class="meta-item"><span class="badge-success">● 43 / 43 SUPERADAS (100%)</span></div>
+      </div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">43</div>
+        <div class="stat-label">Pruebas Totales</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color: var(--success);">100%</div>
+        <div class="stat-label">Tasa de Éxito</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Errores / Fallos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">~3.2s</div>
+        <div class="stat-label">Tiempo de Ejecución</div>
+      </div>
+    </div>
+
+    <!-- Modulo Variables -->
+    <div class="section">
+      <h2 class="section-title">1. Configuración, Constantes y Recursos (<code>variables.py</code>)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre del Test</th>
+            <th>Descripción / Objetivo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>test_cantidad_barcos_ambos_jugadores</code></td>
+            <td>10 barcos asignados al jugador y 10 barcos al rival</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_claves_obligatorias_barcos</code></td>
+            <td>Integridad de claves reglamentarias: ID, Nombre, Longitud, Vidas</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_tipos_datos_barcos</code></td>
+            <td>Validación estricta de tipos de datos en la flota</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_distribucion_flota_reglamentaria</code></td>
+            <td>Distribución oficial: 1x4 (Portaviones), 2x3 (Acorazados), 3x2 (Cruceros), 4x1 (Destructores)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_total_vidas_y_casillas</code></td>
+            <td>Suma de vidas iniciales y casillas exactamente igual a 20</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_ids_unicos</code></td>
+            <td>Sin duplicación de identificadores de barcos</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_constantes_juego_y_tiempos</code></td>
+            <td>Constantes numéricas de tablero (10x10), barcos (10), espera (2000 ms) y ventana (900x550)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_existencia_archivos_assets</code></td>
+            <td>Comprobación física en disco de todos los archivos de sonido (.mp3) y animaciones (.gif)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_paleta_colores_hex</code></td>
+            <td>Formato hexadecimal válido (#RRGGBB) para toda la paleta de colores de diseño</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modulo Tablero y Barco -->
+    <div class="section">
+      <h2 class="section-title">2. Entidades de Dominio (<code>Tablero</code> y <code>Barco</code>)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre del Test</th>
+            <th>Descripción / Objetivo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>test_constructor_tablero</code></td>
+            <td>Atributos de instancia id_jugador, dimension y barcos</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_dimensiones_matriz</code></td>
+            <td>Matriz bidimensional exacta de 10 x 10 con DIMENSION_TABLERO</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_contenido_inicial_agua</code></td>
+            <td>100% de las casillas inicializadas con 'A' (Agua)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_independencia_de_filas</code></td>
+            <td>Filas independientes en memoria (sin referencias compartidas)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_instanciacion_atributos</code></td>
+            <td>Validación del constructor de Barco y propiedades</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_asignar_posicion</code></td>
+            <td>Actualización de coordenadas (x, y) y orientación ('H' / 'V')</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_decremento_de_vidas</code></td>
+            <td>Reducción unitaria de vidas tras impacto</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_crear_desde_diccionario</code></td>
+            <td>Método factory para instanciar barcos a partir de diccionarios limpios</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_crear_flota</code></td>
+            <td>Creación masiva de flotas de 10 barcos a partir de listas de configuración</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modulo Jugador -->
+    <div class="section">
+      <h2 class="section-title">3. Mecánicas de Jugador, Reglas Navales y Audio (<code>clases/jugador.py</code>)</h2>
+      <div class="callout">
+        <strong>Regla naval de no-contacto:</strong> Se comprobó matemáticamente mediante un análisis de vecindario 3x3 que ningún barco toca a otro de forma horizontal, vertical ni diagonal.
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre del Test</th>
+            <th>Descripción / Objetivo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>test_humano_coloca_exactamente_20_casillas</code></td>
+            <td>20 casillas en mapa_barcos y 20 celdas 'B' en el tablero visible</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_maquina_oculta_barcos_en_tablero</code></td>
+            <td>20 casillas en memoria, pero tablero público 100% niebla ('A')</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_coordenadas_dentro_del_rango_oficial</code></td>
+            <td>Todas las coordenadas generadas pertenecen al rango [0..9]</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_regla_no_contacto_entre_barcos</code></td>
+            <td>Verificación de vecindario 3x3: separación estricta entre barcos</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_disparo_agua_coordenada_especifica</code></td>
+            <td>Marcado con 'D', vidas retorna -1, barco None</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_disparo_tocado_reduce_vidas</code></td>
+            <td>Marcado con 'X', reducción de vida del barco impactado</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_disparo_hundido_incrementa_contador</code></td>
+            <td>Al llegar vidas a 0, barcos_hundidos incrementa en 1</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_disparo_aleatorio_no_toca_casillas_ya_disparadas</code></td>
+            <td>La IA nunca ataca casillas previamente marcadas con 'D' o 'X'</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_disparo_aleatorio_en_tablero_limpio</code></td>
+            <td>El disparo aleatorio inicial opera dentro de los límites de 0 a 9</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_disparar_ejecuta_match_case_por_tipo</code></td>
+            <td>Disparo con match/case según tipo de barco (Portaviones, Crucero, Destructor, Acorazado)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modulo UI, Menú, Pantalla Final y Cierre -->
+    <div class="section">
+      <h2 class="section-title">4. Interfaz Gráfica, Gestión de Turnos y Ciclo de Vida (<code>main.py</code> / <code>funciones.py</code>)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre del Test</th>
+            <th>Descripción / Objetivo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>test_tk_disponible</code></td>
+            <td>Inicialización, ciclo de eventos y destrucción de ventana Tkinter</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_inicializar_audio_retorno</code></td>
+            <td>Retorno de tupla de sonidos de baja latencia mediante inicializar_audio</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_escalado_gif_animacion</code></td>
+            <td>Carga de GIF en PhotoImage y submuestreo inteligente subsample(2, 2)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_pantalla_inicio_y_transicion_a_juego</code></td>
+            <td>Pantalla de inicio superpuesta, botón JUGAR y transición limpia a los tableros</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_barra_menu_superior_estructura</code></td>
+            <td>Menús nativos superiores "Partida", "Nueva partida/Reiniciar", "Salir" y "Ayuda"</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_componentes_interfaz_juego</code></td>
+            <td>100 botones radar, 100 botones flota, label y cambios de estado de casillas</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_pantalla_final_integrada_victoria_y_derrota</code></td>
+            <td>Pantalla final integrada con títulos dinámicos y botones Jugar otra vez y Salir</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_mecanica_bloqueo_turno_jugador</code></td>
+            <td>Bloqueo preventivo de clics cuando no es el turno del jugador humano</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_mecanica_repeticion_turno_jugador_tras_impacto</code></td>
+            <td>Mantenimiento del turno en el jugador tras acertar a un barco enemigo</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_mecanica_cambio_turno_tras_agua</code></td>
+            <td>Cesión de turno al ordenador tras disparar sobre agua</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_condicion_fin_de_partida_victoria</code></td>
+            <td>Detección de victoria al alcanzar los 10 barcos rivales hundidos</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_condicion_fin_de_partida_derrota</code></td>
+            <td>Detección de derrota al perder los 10 barcos de la propia flota</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_protocolo_cierre_ventana</code></td>
+            <td>Garantía de salida limpia e inmediata al pulsar la X de la ventana (WM_DELETE_WINDOW)</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_estres_generacion_50_tableros_aleatorios</code></td>
+            <td>50 generaciones consecutivas con 20 casillas exactas y 0 fallos</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+          <tr>
+            <td><code>test_simulacion_10_partidas_completas</code></td>
+            <td>10 partidas de inicio a fin entre bots con victoria legítima</td>
+            <td><span class="status-pill">SUPERADA</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Salida de consola -->
+    <div class="section">
+      <h2 class="section-title">5. Registro de Salida de unittest</h2>
+      <div class="terminal-box">
+...........................................<br>
+----------------------------------------------------------------------<br>
+Ran 43 tests in 3.221s<br><br>
+OK
+      </div>
+    </div>
+  </div>
+</body>
+</html>

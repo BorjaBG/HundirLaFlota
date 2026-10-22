@@ -15,6 +15,8 @@ Recreación interactiva y moderna del clásico juego de estrategia naval **Hundi
 2. [Estructura del Proyecto](#-estructura-del-proyecto)
 3. [Instalación y Ejecución](#-instalación-y-ejecución)
 4. [Reglas del Juego](#-reglas-del-juego)
+   - [Simbología de los Tableros](#-simbología-de-los-tableros)
+   - [Menú Superior y Controles](#-menú-superior-y-controles)
 5. [Diagramas de Flujo de las Funciones Clave](#-diagramas-de-flujo-de-las-funciones-clave)
    - [1. Colocación Aleatoria de Barcos (`colocar_barcos_aleatoriamente`)](#1-colocación-aleatoria-de-barcos-colocar_barcos_aleatoriamente)
    - [2. Mecánica de Disparo y Efectos Sonoros (`disparar`)](#2-mecánica-de-disparo-y-efectos-sonoros-disparar)
@@ -48,6 +50,7 @@ HundirLaFlota/
 ├── main.py                     # Punto de entrada limpio de la aplicación
 ├── funciones.py                # Lógica de juego, interfaz Tkinter y subsistema de audio
 ├── variables.py                # Constantes de juego, dimensiones, rutas de assets y paleta de colores
+├── requirements.txt            # Dependencias del proyecto (pygame)
 │
 ├── clases/                     # Clases del modelo de dominio
 │   ├── __init__.py             # Exportador de clases
@@ -65,10 +68,12 @@ HundirLaFlota/
 │   ├── agua.mp3                # Efecto de disparo al agua
 │   └── barco_hundido.mp3       # Efecto de barco destruido
 │
-└── test/                       # Suite de pruebas automatizadas
-    ├── test_juego.py           # 43 pruebas unitarias, de integración y de interfaz
-    ├── informe_pruebas_hundir_la_flota.md  # Informe técnico en Markdown
-    └── informe_pruebas.html    # Informe interactivo con métricas visuales
+├── test/                       # Suite de pruebas automatizadas
+│   ├── test_juego.py           # 43 pruebas unitarias, de integración y de interfaz
+│   ├── informe_pruebas_hundir_la_flota.md  # Informe técnico en Markdown
+│   └── informe_pruebas.html    # Informe interactivo con métricas visuales
+│
+└── notebook/                   # Prototipo inicial y cuaderno exploratorio en Jupyter
 ```
 
 ---
@@ -140,7 +145,7 @@ _(Instalará `pygame>=2.6.0` para la reproducción de efectos sonoros y música)
 
 ### 5. Cómo Ejecutar el Juego
 
-Una vez completados los pasos anteriores, lanza la aplicación ejecutando [main.py](file:///c:/Bootcamp%20Proyectos/HundirLaFlota/main.py):
+Una vez completados los pasos anteriores, lanza la aplicación ejecutando [`main.py`](./main.py):
 
 ```bash
 python main.py
@@ -171,8 +176,6 @@ El proyecto incluye un conjunto de 43 pruebas unitarias y de integración que ve
 
 ---
 
----
-
 ## 📜 Reglas del Juego
 
 1. Cada flota cuenta con **10 barcos** sumando un total de **20 casillas**:
@@ -186,6 +189,21 @@ El proyecto incluye un conjunto de 43 pruebas unitarias y de integración que ve
    - **Agua (`D`):** Si disparas al agua, se escucha el chapoteo y tras 2 segundos el turno pasa a la máquina.
 4. La máquina responderá disparando automáticamente a casillas no exploradas de tu flota (tablero izquierdo).
 5. **Victoria / Derrota:** El primer jugador en hundir la totalidad de los 10 barcos del rival gana la partida.
+
+### 🏷️ Simbología de los Tableros
+
+| Símbolo | Significado          | Tablero Propio (Izquierdo)                                   | Radar Enemigo (Derecho)                                      |
+| :-----: | :------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| **`B`** | **Barco intacto**    | Casilla ocupada por un barco propio (Gris pizarra `#475569`) | _Oculto al jugador_                                          |
+| **`A`** | **Agua inexplorada** | Mar abierto sin barcos (Azul marino `#0284c7`)               | Casilla no explorada (Gris oscuro `#1e293b` con texto plata) |
+| **`X`** | **Tocado / Hundido** | Barco propio alcanzado por la máquina (Rojo `#dc2626`)       | Barco enemigo alcanzado con éxito (Rojo `#dc2626`)           |
+| **`D`** | **Disparo al agua**  | Disparo fallido de la máquina (Azul marino `#0284c7`)        | Disparo fallido del jugador (Celeste agua `#38bdf8`)         |
+
+### 🎛️ Menú Superior y Controles
+
+- **Partida > Nueva partida/Reiniciar:** Detiene el audio en curso, reinicia el ciclo de juego y genera una nueva distribución procedural para ambos bandos.
+- **Partida > Salir del juego:** Cierra ordenadamente la ventana y finaliza el proceso liberando recursos.
+- **Ayuda > Reglas del juego:** Despliega una ventana modal interactiva con el reglamento completo y composición de las flotas.
 
 ---
 

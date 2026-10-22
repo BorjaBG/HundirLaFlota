@@ -155,7 +155,31 @@ def iniciar_juego():
         '''
             Muestra una ventana modal con las instrucciones y reglas del juego.
         '''
-        messagebox.showinfo("Reglas del juego", "Instrucciones de Hundir la Flota:\n\n1. Dispara a las casillas enemigas del tablero derecho.\n2. Si tocas o hundes un barco, vuelves a disparar.\n3. Si disparas al agua, pasa el turno a la máquina.\n4. ¡Gana quien hunda antes los 10 barcos rivales!")
+        texto_reglas = (
+            "REGLAS DEL JUEGO - HUNDIR LA FLOTA\n\n"
+            "1. Composición de la flota:\n"
+            "   Cada flota cuenta con 10 barcos (20 casillas en total):\n"
+            "   • 1 Portaviones (4 casillas)\n"
+            "   • 2 Acorazados (3 casillas c/u)\n"
+            "   • 3 Cruceros (2 casillas c/u)\n"
+            "   • 4 Destructores (1 casilla c/u)\n\n"
+            "2. Colocación naval:\n"
+            "   Los barcos se posicionan aleatoriamente sin tocarse entre sí\n"
+            "   (ni ortogonal ni diagonalmente, regla de vecindario 3x3).\n\n"
+            "3. Mecánica de disparo (Tu turno):\n"
+            "   Haz clic sobre una casilla del radar enemigo (tablero derecho):\n"
+            "   • Tocado (X): Si aciertas a un barco rival, se reproduce su sonido\n"
+            "     característico y ¡vuelves a disparar!\n"
+            "   • Agua (D): Si disparas al agua, se escucha el chapoteo y tras\n"
+            "     2 segundos el turno pasa a la máquina.\n\n"
+            "4. Turno de la máquina:\n"
+            "   La máquina responderá disparando automáticamente a casillas no\n"
+            "   exploradas de tu flota (tablero izquierdo).\n\n"
+            "5. Condición de victoria:\n"
+            "   El primer jugador en hundir la totalidad de los 10 barcos del rival\n"
+            "   gana la partida."
+        )
+        messagebox.showinfo("Reglas del juego", texto_reglas)
 
     menu_ayuda = Menu(barra_menu, tearoff=0)
     barra_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
@@ -256,7 +280,7 @@ def iniciar_juego():
         mx, my, vidas, barco = maquina.disparar(jugador)
         btn = botones_jugador[(mx, my)]
         if vidas >= 0:
-            btn.config(text="X", bg=COLOR_IMPACTO)
+            btn.config(text="X", bg=COLOR_IMPACTO, fg=COLOR_BLANCO, disabledforeground=COLOR_BLANCO)
             
             if vidas == 0:
                 if maquina.barcos_hundidos == TOTAL_BARCOS:
@@ -269,7 +293,7 @@ def iniciar_juego():
                 lbl_estado.config(text=f"Le han dado a tu {barco.tipo}. La máquina vuelve a disparar...", fg=COLOR_ALERTA)
             ventana.after(TIEMPO_ESPERA_TURNO, turno_maquina)
         else:
-            btn.config(text="D", bg=COLOR_AGUA_TABLERO)
+            btn.config(text="D", bg=COLOR_AGUA_TABLERO, fg=COLOR_BLANCO, disabledforeground=COLOR_BLANCO)
             lbl_estado.config(text="La máquina disparó al agua. ¡Es tu turno!", fg=COLOR_AGUA_DISPARO)
             turno_jugador = True
 
@@ -289,7 +313,7 @@ def iniciar_juego():
 
         _, _, vidas, barco = jugador.disparar(maquina, coordenada_x=coor_x, coordenada_y=coor_y)
         if vidas >= 0:
-            btn.config(text="X", bg=COLOR_IMPACTO, fg=COLOR_BLANCO)
+            btn.config(text="X", bg=COLOR_IMPACTO, fg=COLOR_BLANCO, disabledforeground=COLOR_BLANCO)
             
             if vidas == 0:
                 if jugador.barcos_hundidos == TOTAL_BARCOS:
@@ -303,7 +327,7 @@ def iniciar_juego():
             
         else:
             turno_jugador = False
-            btn.config(text="D", bg=COLOR_AGUA_DISPARO, fg=COLOR_NEGRO)
+            btn.config(text="D", bg=COLOR_AGUA_DISPARO, fg=COLOR_NEGRO, disabledforeground=COLOR_NEGRO)
             lbl_estado.config(text=f"Agua en ({coor_x}, {coor_y}). Turno de la máquina...", fg=COLOR_TEXTO_MUTED)
             ventana.after(TIEMPO_ESPERA_TURNO, turno_maquina)
 
@@ -315,7 +339,7 @@ def iniciar_juego():
                 text="A",
                 width=2,
                 height=1,
-                font=("Arial", 9, "bold"),
+                font=("Arial", 10, "bold"),
                 bg=COLOR_FONDO_PRINCIPAL,
                 fg=COLOR_RADAR_AGUA,
                 activebackground=COLOR_AGUA_DISPARO
@@ -336,9 +360,10 @@ def iniciar_juego():
                 text=texto,
                 width=2,
                 height=1,
-                font=("Arial", 9, "bold"),
+                font=("Arial", 10, "bold"),
                 bg=color_fondo,
                 fg=COLOR_BLANCO,
+                disabledforeground=COLOR_BLANCO,
                 state="disabled"
             )
             btn.grid(row=x + 1, column=y, padx=1, pady=1)

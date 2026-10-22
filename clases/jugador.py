@@ -9,39 +9,82 @@ except ImportError:
     from barco import Barco
     from tablero import Tablero
 
+try:
+    from variables import (
+        DIMENSION_TABLERO,
+        TOTAL_CASILLAS_BARCOS,
+        MAX_INTENTOS_COLOCACION,
+        RUTA_CRUCERO_MP3,
+        RUTA_PORTAVIONES_MP3,
+        RUTA_ACORAZADO_MP3,
+        RUTA_DESTRUCTOR_MP3,
+        RUTA_AGUA_MP3,
+    )
+except ImportError:
+    DIMENSION_TABLERO = 10
+    TOTAL_CASILLAS_BARCOS = 20
+    MAX_INTENTOS_COLOCACION = 1000
+    RUTA_CRUCERO_MP3 = "assets/crucero.mp3"
+    RUTA_PORTAVIONES_MP3 = "assets/portaviones.mp3"
+    RUTA_ACORAZADO_MP3 = "assets/acorazado.mp3"
+    RUTA_DESTRUCTOR_MP3 = "assets/destructor.mp3"
+    RUTA_AGUA_MP3 = "assets/agua.mp3"
+
 # 1. Inicializar el mixer ANTES de cargar cualquier sonido (con buffer de 512 para 0 delay)
 if not pygame.mixer.get_init():
     pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
     pygame.mixer.init()
 
 try:
-    SONIDO_CRUCERO = pygame.mixer.Sound("assets/crucero.mp3")
+    SONIDO_CRUCERO = pygame.mixer.Sound(RUTA_CRUCERO_MP3)
 except Exception:
     SONIDO_CRUCERO = None
 
 try:
-    SONIDO_PORTAVIONES = pygame.mixer.Sound("assets/portaviones.mp3")
+    SONIDO_PORTAVIONES = pygame.mixer.Sound(RUTA_PORTAVIONES_MP3)
 except Exception:
     SONIDO_PORTAVIONES = None
 
 try:
-    SONIDO_ACORAZADO = pygame.mixer.Sound("assets/acorazado.mp3")
+    SONIDO_ACORAZADO = pygame.mixer.Sound(RUTA_ACORAZADO_MP3)
 except Exception:
     SONIDO_ACORAZADO = None
 
 try:
-    SONIDO_DESTRUCTOR = pygame.mixer.Sound("assets/destructor.mp3")
+    SONIDO_DESTRUCTOR = pygame.mixer.Sound(RUTA_DESTRUCTOR_MP3)
 except Exception:
     SONIDO_DESTRUCTOR = None
 
 try:
-    SONIDO_AGUA = pygame.mixer.Sound("assets/agua.mp3")
+    SONIDO_AGUA = pygame.mixer.Sound(RUTA_AGUA_MP3)
 except Exception:
     SONIDO_AGUA = None
 
 
 class Jugador:
+    '''
+        Clase para representar a un jugador.
+
+        Attributes:
+            nombre (str): Nombre del jugador.
+            barcos (list[Barco]): Lista de barcos del jugador.
+            es_maquina (bool): Indica si el jugador es la maquina.
+            tablero (list[list[str]]): Tablero del jugador.
+            mapa_barcos (dict): Diccionario con los barcos del jugador.
+            barcos_hundidos (int): Numero de barcos hundidos.
+    '''
     def __init__(self, nombre: str, barcos: list[Barco], es_maquina: bool = False):
+        '''
+            Inicializa un jugador.
+
+            Args:
+                nombre (str): Nombre del jugador.
+                barcos (list[Barco]): Lista de barcos del jugador.
+                es_maquina (bool): Indica si el jugador es la maquina.
+
+            Returns:
+                None
+        '''
         self.nombre = nombre
         self.barcos = barcos
         self.es_maquina = es_maquina
@@ -50,23 +93,19 @@ class Jugador:
         self.barcos_hundidos = 0
         self.colocar_barcos_aleatoriamente()
 
-    
-    '''def colocar_barcos(self):
-        for barco in self.barcos:
-            #cont = 0
-            x, y = barco.x, barco.y
-            longitud = barco.longitud
-            for _ in range(longitud):
-                self.mapa_barcos[(x, y)] = barco
+    def colocar_barcos_aleatoriamente(self, dimension=DIMENSION_TABLERO, max_intentos=MAX_INTENTOS_COLOCACION):
+        '''
+            Funcion para colocar los barcos de forma aleatoria en el tablero.
+            Asigna una posicion y orientacion a cada barco.
+            Si un barco no se puede colocar, se reinicia el tablero.
 
-                if not self.es_maquina:
-                    self.tablero[x][y] = 'B'
-                if barco.orientacion == 'H':
-                    y += 1
-                else:
-                    x += 1'''
-
-    def colocar_barcos_aleatoriamente(self, dimension=10, max_intentos=1000):
+            Args:
+                dimension (int): Dimension del tablero.
+                max_intentos (int): Numero maximo de intentos para colocar los barcos.
+            
+            Returns:
+                None
+        '''
         while True:
             self.tablero = Tablero.crear_tablero()
             self.mapa_barcos = {}
@@ -119,15 +158,25 @@ class Jugador:
                 if not colocado:
                     hubo_fallo = True
                     break
-            # Si ningún barco falló y tenemos las 20 casillas completas, terminamos con éxito
-            if not hubo_fallo and len(self.mapa_barcos) == 20:
+            # Si ningún barco falló y tenemos todas las casillas completas, terminamos con éxito
+            if not hubo_fallo and len(self.mapa_barcos) == TOTAL_CASILLAS_BARCOS:
                 break
 
     def disparar(self, rival: 'Jugador', coordenada_x: int = None, coordenada_y: int = None):
+        '''
+            Funcion para disparar a un barco.
+            Args:
+                rival (Jugador): Jugador rival.
+                coordenada_x (int): Coordenada X del disparo.
+                coordenada_y (int): Coordenada Y del disparo.
+            
+            Returns:
+                tuple: Tupla con las coordenadas del disparo y el barco afectado.
+        '''
         if coordenada_x is None or coordenada_y is None:
             while True:
-                coordenada_x = random.randint(0, 9)
-                coordenada_y = random.randint(0, 9)
+                coordenada_x = random.randint(0, DIMENSION_TABLERO - 1)
+                coordenada_y = random.randint(0, DIMENSION_TABLERO - 1)
 
                 if rival.tablero[coordenada_x][coordenada_y] not in ['D', 'X']:
                     break
@@ -157,46 +206,3 @@ class Jugador:
                 SONIDO_AGUA.play()
             rival.tablero[coordenada_x][coordenada_y] = 'D'
             return coordenada_x, coordenada_y, -1, None
-
-    '''def disparar(self, rival: 'Jugador'):
-        bucle = True
-        while bucle:
-            disparo = True
-            if not self.es_maquina:
-                try:
-                    coor_x = int(input("Introduzca la coordenada X a la que disparar:"))
-                    coor_y = int(input("Introduzca la coordenada Y a la que disparar:"))
-                except ValueError:
-                    print("Error al introducir las coordenadas. Las coordenadas tienen que ser numeros entre 0 y 9")
-                    continue
-
-                if coor_x < 0 or coor_x > 9:
-                    print("La coordenada X no puede ser menor a 0 ni mayor a 9")
-                    disparo = False
-                elif coor_y < 0 or coor_y > 9:
-                    print("La coordenada Y no puede ser menor a 0 ni mayor a 9")
-                    disparo = False
-                elif rival.tablero[coor_x][coor_y] in ['D', 'X']:
-                    disparo = False
-                    print("Ya has disparado anteriormente a esa coordenada")
-            else:
-                coor_x = random.randint(0, 9)
-                coor_y = random.randint(0, 9)
-                #print("Dispara la maquina")
-                if rival.tablero[coor_x][coor_y] in ['D', 'X']:
-                    disparo = False  
-
-            if disparo:
-                vidas = 0
-                bucle = False
-                if (coor_x, coor_y) in rival.mapa_barcos:
-                    barco = rival.mapa_barcos[(coor_x, coor_y)]
-                    barco.vidas -= 1
-                    vidas = barco.vidas
-                    rival.tablero[coor_x][coor_y] = "X"
-                else:
-                    vidas = -1
-                    rival.tablero[coor_x][coor_y] = "D"
-                    
-                print(f"X: {coor_x}\tY: {coor_y}")
-                return vidas'''

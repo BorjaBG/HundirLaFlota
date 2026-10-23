@@ -217,19 +217,19 @@ _Ubicación:_ [`clases/jugador.py`](./clases/jugador.py)
 Se encarga de posicionar los 10 barcos de forma procedural garantizando la separación en vecindario 3x3 sin bloqueos.
 
 ```mermaid
-%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
+%%{init: {'flowchart': {'nodePadding': 15, 'rankSpacing': 35}}}%%
 graph TD
-    Start(["Inicio: colocar_barcos_aleatoriamente"]) --> ResetBoard["Crear matriz vacía 10x10<br/>Inicializar matriz ocupado con padding 12x12"]
-    ResetBoard --> SortShips["Ordenar barcos por longitud descendente"]
+    Start(["Inicio:<br/>colocar_barcos_aleatoriamente"]) --> ResetBoard["Crear matriz vacía 10x10<br/>Inicializar matriz ocupado<br/>con padding 12x12"]
+    ResetBoard --> SortShips["Ordenar barcos por<br/>longitud descendente"]
     SortShips --> LoopShips{"¿Quedan barcos<br/>por colocar?"}
 
     LoopShips -- Sí --> InitAttempts["intentos = 0"]
-    InitAttempts --> CheckAttempts{"intentos < max_intentos?"}
+    InitAttempts --> CheckAttempts{"¿intentos <<br/>max_intentos?"}
 
-    CheckAttempts -- Sí --> GenPos["Elegir orientación aleatoria ('H' o 'V')<br/>Generar coordenadas (x, y) válidas según tamaño"]
-    GenPos --> Check3x3{"¿Todas las casillas y su<br/>vecindario 3x3 están libres?"}
+    CheckAttempts -- Sí --> GenPos["Elegir orientación ('H'/'V')<br/>Generar coordenadas (x, y)<br/>válidas según tamaño"]
+    GenPos --> Check3x3{"¿Casillas y vecindario<br/>3x3 están libres?"}
 
-    Check3x3 -- Sí --> PlaceShip["Asignar coordenadas al barco<br/>Registrar en mapa_barcos<br/>Marcar casillas y vecindario como ocupados"]
+    Check3x3 -- Sí --> PlaceShip["Asignar coordenadas al barco<br/>Registrar en mapa_barcos<br/>Marcar casillas y<br/>vecindario ocupados"]
     PlaceShip --> LoopShips
 
     Check3x3 -- No --> IncAttempts["intentos += 1"]
@@ -238,8 +238,8 @@ graph TD
     CheckAttempts -- No --> BoardFailed["Fallo al colocar barco"]
     BoardFailed --> ResetBoard
 
-    LoopShips -- No --> Verify20{"¿len(mapa_barcos) == 20?"}
-    Verify20 -- Sí --> Done(["Fin: Tablero válido generado con éxito"])
+    LoopShips -- No --> Verify20{"¿len(mapa_barcos)<br/>== 20?"}
+    Verify20 -- Sí --> Done(["Fin: Tablero válido<br/>generado con éxito"])
     Verify20 -- No --> ResetBoard
 ```
 
@@ -251,33 +251,33 @@ _Ubicación:_ [`clases/jugador.py`](./clases/jugador.py)
 Gestiona el impacto sobre el rival, la actualización del estado de vidas, el conteo de barcos hundidos y la reproducción sonora por tipo de navío.
 
 ```mermaid
-%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
+%%{init: {'flowchart': {'nodePadding': 15, 'rankSpacing': 35}}}%%
 graph TD
-    Start(["Inicio: disparar(rival, coord_x, coord_y)"]) --> HasCoords{"¿Se recibieron<br/>coordenadas?"}
+    Start(["Inicio: disparar<br/>(rival, coord_x, coord_y)"]) --> HasCoords{"¿Se recibieron<br/>coordenadas?"}
 
-    HasCoords -- No (IA) --> GenRandom["Generar (x, y) aleatorias entre 0 y 9"]
+    HasCoords -- No (IA) --> GenRandom["Generar (x, y) aleatorias<br/>entre 0 y 9"]
     GenRandom --> CheckFired{"¿rival.tablero[x][y]<br/>ya tiene 'D' o 'X'?"}
     CheckFired -- Sí --> GenRandom
     CheckFired -- No --> CheckHit
 
-    HasCoords -- Sí (Humano) --> CheckHit{"¿(coord_x, coord_y)<br/>está en rival.mapa_barcos?"}
+    HasCoords -- Sí (Humano) --> CheckHit{"¿(coord_x, coord_y)<br/>en rival.mapa_barcos?"}
 
-    CheckHit -- Sí (Impacto) --> IdentifyShip["Identificar barco en la coordenada"]
-    IdentifyShip --> CheckSound{"¿Es disparo del jugador?"}
-    CheckSound -- Sí --> PlayShipSound["match barco.tipo:<br/>- Portaviones: audio portaviones<br/>- Crucero: audio crucero<br/>- Destructor: audio destructor<br/>- Acorazado: audio acorazado"]
+    CheckHit -- Sí (Impacto) --> IdentifyShip["Identificar barco<br/>en la coordenada"]
+    IdentifyShip --> CheckSound{"¿Es disparo<br/>del jugador?"}
+    CheckSound -- Sí --> PlayShipSound["match barco.tipo:<br/>• Portaviones: audio portaviones<br/>• Crucero: audio crucero<br/>• Destructor: audio destructor<br/>• Acorazado: audio acorazado"]
     CheckSound -- No --> ReduceLife
     PlayShipSound --> ReduceLife["barco.vidas -= 1<br/>rival.tablero[x][y] = 'X'"]
 
-    ReduceLife --> CheckSunk{"¿barco.vidas == 0?"}
+    ReduceLife --> CheckSunk{"¿barco.vidas<br/>== 0?"}
     CheckSunk -- Sí --> IncSunk["self.barcos_hundidos += 1"]
-    CheckSunk -- No --> ReturnHit["Retornar (x, y, barco.vidas, barco)"]
+    CheckSunk -- No --> ReturnHit["Retornar<br/>(x, y, barco.vidas, barco)"]
     IncSunk --> ReturnHit
 
-    CheckHit -- No (Agua) --> PlayWater{"¿Es disparo del jugador?"}
+    CheckHit -- No (Agua) --> PlayWater{"¿Es disparo<br/>del jugador?"}
     PlayWater -- Sí --> SoundAgua["Reproducir SONIDO_AGUA"]
     PlayWater -- No --> MarkWater
     SoundAgua --> MarkWater["rival.tablero[x][y] = 'D'"]
-    MarkWater --> ReturnWater["Retornar (x, y, -1, None)"]
+    MarkWater --> ReturnWater["Retornar<br/>(x, y, -1, None)"]
 ```
 
 ---
@@ -288,31 +288,31 @@ _Ubicación:_ [`funciones.py`](./funciones.py)
 Orquesta la alternancia entre el usuario y la computadora, el bloqueo de clics y las condiciones de victoria o derrota.
 
 ```mermaid
-%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
+%%{init: {'flowchart': {'nodePadding': 15, 'rankSpacing': 35}}}%%
 graph TD
-    StartPlayer(["Clic del jugador en casilla (x, y) del radar"]) --> ValidateState{"¿juego_activo Y<br/>turno_jugador == True?"}
+    StartPlayer(["Clic del jugador en<br/>casilla (x, y) del radar"]) --> ValidateState{"¿juego_activo Y<br/>turno_jugador?"}
 
-    ValidateState -- No --> IgnoreClick["Ignorar clic (acción bloqueada)"]
-    ValidateState -- Sí --> DisableBtn["Deshabilitar botón pulsado<br/>Ejecutar jugador.disparar(maquina, x, y)"]
+    ValidateState -- No --> IgnoreClick["Ignorar clic<br/>(acción bloqueada)"]
+    ValidateState -- Sí --> DisableBtn["Deshabilitar botón pulsado<br/>jugador.disparar(maquina, x, y)"]
 
     DisableBtn --> CheckResult{"¿vidas >= 0?<br/>(Impacto)"}
 
-    CheckResult -- Sí --> MarkX["Botón = 'X' (Rojo impacto)"]
-    MarkX --> CheckWin{"¿jugador.barcos_hundidos<br/>== TOTAL_BARCOS?"}
-    CheckWin -- Sí --> WinGame["juego_activo = False<br/>after(2000 ms) -> mostrar_pantalla_final(victoria=True)"]
-    CheckWin -- No --> RepeatPlayer["Mensaje: ¡Tocado/Hundido!<br/>turno_jugador = True (Repite disparo)"]
+    CheckResult -- Sí --> MarkX["Botón = 'X'<br/>(Rojo impacto)"]
+    MarkX --> CheckWin{"¿barcos_hundidos<br/>== TOTAL_BARCOS?"}
+    CheckWin -- Sí --> WinGame["juego_activo = False<br/>after(2000 ms) -><br/>mostrar_pantalla_final(victoria=True)"]
+    CheckWin -- No --> RepeatPlayer["Mensaje: ¡Tocado/Hundido!<br/>turno_jugador = True<br/>(Repite disparo)"]
 
-    CheckResult -- No (Agua) --> MarkD["Botón = 'D' (Azul agua)<br/>turno_jugador = False"]
-    MarkD --> WaitTurn["after(2000 ms) -> invocar turno_maquina()"]
+    CheckResult -- No (Agua) --> MarkD["Botón = 'D'<br/>(Azul agua)<br/>turno_jugador = False"]
+    MarkD --> WaitTurn["after(2000 ms) -><br/>invocar turno_maquina()"]
 
-    WaitTurn --> MachineShoot["maquina.disparar(jugador)<br/>Actualizar botón en flota del jugador"]
+    WaitTurn --> MachineShoot["maquina.disparar(jugador)<br/>Actualizar botón en flota"]
     MachineShoot --> MachineResult{"¿vidas >= 0?<br/>(Impacto máquina)"}
 
-    MachineResult -- Sí --> CheckDefeat{"¿maquina.barcos_hundidos<br/>== TOTAL_BARCOS?"}
-    CheckDefeat -- Sí --> DefeatGame["juego_activo = False<br/>after(2000 ms) -> mostrar_pantalla_final(victoria=False)"]
-    CheckDefeat -- No --> RepeatMachine["after(2000 ms) -> turno_maquina()<br/>(La máquina vuelve a disparar)"]
+    MachineResult -- Sí --> CheckDefeat{"¿máquina hundidos<br/>== TOTAL_BARCOS?"}
+    CheckDefeat -- Sí --> DefeatGame["juego_activo = False<br/>after(2000 ms) -><br/>mostrar_pantalla_final(victoria=False)"]
+    CheckDefeat -- No --> RepeatMachine["after(2000 ms) -><br/>turno_maquina()<br/>(Máquina repite)"]
 
-    MachineResult -- No (Agua) --> PassToPlayer["Botón jugador = 'D'<br/>turno_jugador = True (Turno del jugador)"]
+    MachineResult -- No (Agua) --> PassToPlayer["Botón jugador = 'D'<br/>turno_jugador = True<br/>(Turno del jugador)"]
 ```
 
 ---
@@ -323,34 +323,34 @@ _Ubicación:_ [`main.py`](./main.py) y [`funciones.py`](./funciones.py)
 Estructura de ejecución general de la aplicación, transiciones entre menús y reinicio de partidas.
 
 ```mermaid
-%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
+%%{init: {'flowchart': {'nodePadding': 15, 'rankSpacing': 35}}}%%
 graph TD
     MainApp(["main() en main.py"]) --> StartLoop["while jugar_de_nuevo:"]
-    StartLoop --> CallInit["iniciar_juego() en funciones.py"]
+    StartLoop --> CallInit["iniciar_juego()<br/>en funciones.py"]
 
-    CallInit --> InitAudio["inicializar_audio()<br/>(pygame.mixer.pre_init buffer=512)"]
+    CallInit --> InitAudio["inicializar_audio()<br/>(buffer=512 sin latencia)"]
     InitAudio --> CreateFleets["Barco.crear_flota(barcos)<br/>Barco.crear_flota(barcos_maquina)"]
-    CreateFleets --> BuildGUI["Construir ventana Tkinter (900x550)<br/>Montar barra de menús (Partida / Ayuda)<br/>Generar tableros (100 + 100 botones)"]
-    BuildGUI --> ShowStart["Mostrar frame_inicio (Pantalla de bienvenida)"]
+    CreateFleets --> BuildGUI["Ventana Tkinter (900x550)<br/>Barra de menús (Partida / Ayuda)<br/>Tableros (100 + 100 botones)"]
+    BuildGUI --> ShowStart["Mostrar frame_inicio<br/>(Pantalla de bienvenida)"]
 
-    ShowStart --> StartAction{"Interacción del usuario"}
-    StartAction -- "Botón Salir" --> ExitGame["accion_salir() -> destroy() -> return False"]
-    StartAction -- "Botón JUGAR" --> DestroyStart["Destruir frame_inicio<br/>Mostrar barra de estado y tableros de juego"]
+    ShowStart --> StartAction{"Interacción<br/>del usuario"}
+    StartAction -- "Botón Salir" --> ExitGame["accion_salir() -> destroy()<br/>return False"]
+    StartAction -- "Botón JUGAR" --> DestroyStart["Destruir frame_inicio<br/>Mostrar barra de estado<br/>y tableros de juego"]
 
-    DestroyStart --> GamePlaying["Partida en curso (Gestión de turnos)"]
-    GamePlaying --> EndCondition{"Fin de partida detectado"}
+    DestroyStart --> GamePlaying["Partida en curso<br/>(Gestión de turnos)"]
+    GamePlaying --> EndCondition{"Fin de partida<br/>detectado"}
 
-    EndCondition --> ShowEnd["mostrar_pantalla_final(victoria)"]
-    ShowEnd --> PlayEndSound["Reproducir sonido victoria/derrota<br/>Cargar y escalar GIF correspondiente"]
-    PlayEndSound --> EndButtons{"Decisión final"}
+    EndCondition --> ShowEnd["mostrar_pantalla_final<br/>(victoria)"]
+    ShowEnd --> PlayEndSound["Reproducir sonido final<br/>Cargar y escalar GIF"]
+    PlayEndSound --> EndButtons{"Decisión<br/>final"}
 
-    EndButtons -- "Jugar otra vez" --> ActionRestart["accion_reiniciar() -> pygame.mixer.stop()<br/>reiniciar_partida = True -> destroy()"]
-    EndButtons -- "Salir del juego / [X]" --> ActionExit["accion_salir() -> pygame.mixer.stop()<br/>reiniciar_partida = False -> destroy()"]
+    EndButtons -- "Jugar otra vez" --> ActionRestart["accion_reiniciar():<br/>pygame.mixer.stop()<br/>reiniciar_partida = True<br/>destroy()"]
+    EndButtons -- "Salir del juego / [X]" --> ActionExit["accion_salir():<br/>pygame.mixer.stop()<br/>reiniciar_partida = False<br/>destroy()"]
 
     ActionRestart --> ReturnBool["return reiniciar_partida"]
     ActionExit --> ReturnBool
 
-    ReturnBool --> LoopCondition{"¿jugar_de_nuevo == True?"}
+    ReturnBool --> LoopCondition{"¿jugar_de_nuevo<br/>== True?"}
     LoopCondition -- Sí --> StartLoop
     LoopCondition -- No --> EndApp(["Fin del programa"])
 ```

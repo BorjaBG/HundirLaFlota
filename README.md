@@ -217,6 +217,7 @@ _Ubicación:_ [`clases/jugador.py`](./clases/jugador.py)
 Se encarga de posicionar los 10 barcos de forma procedural garantizando la separación en vecindario 3x3 sin bloqueos.
 
 ```mermaid
+%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
 graph TD
     Start(["Inicio: colocar_barcos_aleatoriamente"]) --> ResetBoard["Crear matriz vacía 10x10<br/>Inicializar matriz ocupado con padding 12x12"]
     ResetBoard --> SortShips["Ordenar barcos por longitud descendente"]
@@ -250,6 +251,7 @@ _Ubicación:_ [`clases/jugador.py`](./clases/jugador.py)
 Gestiona el impacto sobre el rival, la actualización del estado de vidas, el conteo de barcos hundidos y la reproducción sonora por tipo de navío.
 
 ```mermaid
+%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
 graph TD
     Start(["Inicio: disparar(rival, coord_x, coord_y)"]) --> HasCoords{"¿Se recibieron<br/>coordenadas?"}
 
@@ -286,6 +288,7 @@ _Ubicación:_ [`funciones.py`](./funciones.py)
 Orquesta la alternancia entre el usuario y la computadora, el bloqueo de clics y las condiciones de victoria o derrota.
 
 ```mermaid
+%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
 graph TD
     StartPlayer(["Clic del jugador en casilla (x, y) del radar"]) --> ValidateState{"¿juego_activo Y<br/>turno_jugador == True?"}
 
@@ -320,6 +323,7 @@ _Ubicación:_ [`main.py`](./main.py) y [`funciones.py`](./funciones.py)
 Estructura de ejecución general de la aplicación, transiciones entre menús y reinicio de partidas.
 
 ```mermaid
+%%{init: {'flowchart': {'nodePadding': 25, 'rankSpacing': 45}}}%%
 graph TD
     MainApp(["main() en main.py"]) --> StartLoop["while jugar_de_nuevo:"]
     StartLoop --> CallInit["iniciar_juego() en funciones.py"]
